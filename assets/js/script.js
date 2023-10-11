@@ -53,69 +53,27 @@ function setDate() {
 }
 
 function renderTimeBlocks() {
-
-  // dayjs object set to today's date during the 9 o'clock hour
   var todayAtNine = getTodayAtNine();
 
   for (var i = 0; i < 8; i++) {
-    // var militaryHour = 9 + i;
-    // var timeObj = genTimeObject(militaryHour);
-    // var timePeriod = getTimePeriod(militaryHour);
+    var blockTime = todayAtNine.add(i, "hour");
 
-    // console.log(timeBlockHour);
+    // console.log("blockTime: " + blockTime.format("dddd MMMM Do, YYYY H:mm"));
 
-    // timeBlocksDiv.append($(`
-    //   <div id="hour-${timeBlockHour}" class="row time-block">
-    //     <div class="col-2 col-md-1 hour text-center py-3">${timeBlockHour.format("hh A")}</div>
-    //     <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
-    //     <button class="btn saveBtn col-2 col-md-1" aria-label="save">
-    //       <i class="fas fa-save" aria-hidden="true"></i>
-    //     </button>
-    //   </div>
-    // `));
+    var timeDiff = blockTime.diff(now, "hour");
+
+    // console.log("timeDiff: " + timeDiff);
+
+    timeBlocksDiv.append($(`
+      <div id="hour-${blockTime.format("H")}" class="row time-block ${getTimePeriod(timeDiff)}">
+        <div class="col-2 col-md-1 hour text-center py-3">${blockTime.format("h A")}</div>
+        <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
+        <button class="btn saveBtn col-2 col-md-1" aria-label="save">
+          <i class="fas fa-save" aria-hidden="true"></i>
+        </button>
+      </div>
+    `));
   }
-
-  // var now = dayjs();
-
-  var otherDate = dayjs("2023-10-1");
-
-  var diffBetween = otherDate.diff(now, "hours");
-
-  console.log(diffBetween);
-
-  // var earlierToday = dayjs("2023-10-06 10:00:00");
-
-  // console.log(earlierToday.diff(now, "hours"));
-
-  // $('#1a').text(now.format('M D, YY hh:mm:ss'));
-
-  // var evenLongerAway = dayjs("5/4/27");
-
-  // $("#6a").text(evenLongerAway.diff(now, "days"));
-
-  // console.log(earlierToday.diff(now, "hours"));
-
-  // var now = dayjs();
-
-  // var otherDate = dayjs("2023-10-1");
-
-  // var diffBetween = now.diff(otherDate, "hours");
-
-  // console.log(diffBetween);
-
-  // var earlierToday = dayjs("2023-10-06 10:00:00");
-
-  // console.log(earlierToday.diff(now, "hours"));
-
-  //   < !--Use class for "past", "present", and "future" to apply styles to the
-  // time - block divs accordingly.The javascript will need to do this by
-  //       adding / removing these classes on each div by comparing the hour in the
-  //       id to the current hour.The html provided below is meant to be an example
-  //       demonstrating how the css provided can be leveraged to create the
-  //       desired layout and colors.The html below should be removed or updated
-  //   in the finished product.Remember to delete this comment once the
-  //       code is implemented.
-  //       -->
 }
 
 // checks to see if hour/date has changed, redraws time blocks/date if so
@@ -125,42 +83,35 @@ function hourCheck() {
   if (now.format("mm:ss") === "00:00") {
     renderTimeBlocks();
 
+    console.log("new hour detected. Redrawing time blocks!");
+
     // midnight, new day - update date at top of screen
-    if (now.format("HH") === "00")
+    if (now.format("HH") === "00") {
       setDate();
+
+      console.log("new day detected. Changing date at top of screen!");
+    }
   }
 }
 
 function getTodayAtNine() {
   var diffFromNine = now.format("H") - 9;
 
-  console.log(diffFromNine);
+  // console.log("diffFromNine: " + diffFromNine);
 
   var todayAtNine = dayjs().add((diffFromNine * -1), 'hour');
 
-  console.log(todayAtNine);
-  console.log(todayAtNine.format("MMMM Do, YYYY hh:mm:ss"));
-  console.log(todayAtNine.diff(now, "hour"));
+  // console.log("todayAtNine: " + todayAtNine.format("MMMM Do, YYYY hh:mm:ss"));
+  // console.log("todayAtNine diff: " + todayAtNine.diff(now, "hour"));
 
   return todayAtNine;
 }
 
-// function genTimeObject(militaryHour) {
-//   var timeObj = {
-//     hour: ((militaryHour > 12) ? (militaryHour - 12) : militaryHour),
-//     hourSuffix: ((militaryHour > 11) ? "PM" : "AM")
-//   }
-
-//   return timeObj;
-// }
-
-// function getTimePeriod(hourToCompare) {
-//   var currentHour = now.format("HH");
-
-//   if (currentHour < hourToCompare)
-//     return "future";
-//   else if (currentHour > hourToCompare)
-//     return "past";
-//   else
-//     return "present";
-// }
+function getTimePeriod(timeDiff) {
+  if (timeDiff > 0)
+    return "future";
+  else if (timeDiff < 0)
+    return "past";
+  else
+    return "present";
+}
