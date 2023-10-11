@@ -27,6 +27,11 @@
 // attribute of each time-block be used to do this?
 // });
 
+// run onBlur (user selects something else than this tab), log time to local storage
+// run onFocus (user goes back to this tab), test current time see if hour/day has changed, and re-render if necessary
+// attach eventListener to both onBlur or onFocus? Or just to document and do event delegation?
+
+const wind = $(window);
 const currentDay = $("#currentDay");
 const timeBlocksDiv = $(".time-blocks");
 
@@ -53,6 +58,8 @@ function setDate() {
 }
 
 function renderTimeBlocks() {
+  // delete all previous time blocks here
+
   var todayAtNine = getTodayAtNine();
 
   for (var i = 0; i < 8; i++) {
@@ -96,14 +103,7 @@ function hourCheck() {
 
 function getTodayAtNine() {
   var diffFromNine = now.format("H") - 9;
-
-  // console.log("diffFromNine: " + diffFromNine);
-
   var todayAtNine = dayjs().add((diffFromNine * -1), 'hour');
-
-  // console.log("todayAtNine: " + todayAtNine.format("MMMM Do, YYYY hh:mm:ss"));
-  // console.log("todayAtNine diff: " + todayAtNine.diff(now, "hour"));
-
   return todayAtNine;
 }
 
@@ -115,3 +115,34 @@ function getTimePeriod(timeDiff) {
   else
     return "present";
 }
+
+function onBlur() {
+  localStorage.setItem("blurTime", JSON.stringify(now));
+  console.log("onBlur fired");
+}
+
+function onFocus() {
+  console.log("onFocus fired");
+  var blurTime = JSON.parse(localStorage.getItem("blurTime")) || undefined;
+
+  console.log(blurTime);
+
+  if (blurTime !== undefined) {
+    now = dayjs();
+    var diff = now.diff(blurTime, "hour");
+
+    if (diff !== 0) {
+      console.log("blurTime and now are different hours! Re-rendering bars!");
+      renderTimeBlocks();
+
+      if (diff < 0) {
+        setDate();
+        console.log("now is now earlier than blurTime. New day detected!");
+      }
+    }
+  }
+
+}
+
+wind.on("blur", onBlur);
+wind.on("focus", onFocus);
