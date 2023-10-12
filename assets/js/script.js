@@ -72,10 +72,8 @@ function onSaveBtnClick() {
   // get string from text area
   var textAreaVal = $(this).siblings(".description").val();
 
-  // if text area is not empty, save contents to localStorage
-  if (textAreaVal !== "") {
-    localStorage.setItem(timeBlockID, JSON.stringify(textAreaVal));
-  }
+  // save contents to localStorage
+  localStorage.setItem(timeBlockID, JSON.stringify(textAreaVal));
 }
 
 // time blocks event listener with event delegation
